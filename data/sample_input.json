@@ -1,0 +1,46 @@
+{
+    "banking": {
+      "CreditScore": 650,
+      "Age": 40,
+      "Tenure": 5,
+      "Balance": 12000.50,
+      "NumOfProducts": 2,
+      "HasCrCard": 1,
+      "IsActiveMember": 1,
+      "EstimatedSalary": 75000,
+      "Complain": 0,
+      "SatisfactionScore": 3,
+      "PointsEarned": 120,
+      "France": 0,
+      "Germany": 1,
+      "Spain": 0,
+      "Male": 1,
+      "Female": 0,
+      "DIAMOND": 0,
+      "GOLD": 1,
+      "SILVER": 0,
+      "PLATINUM": 0
+    },
+    "telecom": {
+      "Contract": "Month-to-month",
+      "InternetService": "Fiber optic",
+      "PaymentMethod": "Electronic check",
+      "PaperlessBilling": 1,
+      "SeniorCitizen": 0,
+      "StreamingTV": 1,
+      "StreamingMovies": 0,
+      "MultipleLines": 1,
+      "PhoneService": 1,
+      "DeviceProtection": 1,
+      "OnlineBackup": 1,
+      "Partner": 0,
+      "Dependents": 0,
+      "TechSupport": 1,
+      "OnlineSecurity": 1,
+      "MonthlyCharges": 100.5,
+      "TotalCharges": 1200,
+      "Tenure": 12,
+      "gender": "Male"
+    }
+  }
+  
