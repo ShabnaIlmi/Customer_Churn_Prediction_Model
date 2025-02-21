@@ -107,7 +107,7 @@ def parse_telecom_form(form_data):
 # Predict Bank Churn
 @app.route('/api/bank-churn-prediction', methods=['POST'])
 def predict_banking():
-    form_data = request.form
+    form_data = request.get_json()  # Parse incoming JSON request
     user_data = parse_banking_form(form_data)
     user_data_scaled = banking_scaler.transform(user_data)
     prediction = banking_model.predict(user_data_scaled)
@@ -116,7 +116,7 @@ def predict_banking():
 # Predict Telecom Churn
 @app.route('/api/telecom-churn-prediction', methods=['POST'])
 def predict_telecom():
-    form_data = request.form
+    form_data = request.get_json()  # Parse incoming JSON request
     user_data = parse_telecom_form(form_data)
     user_data_scaled = telecom_scaler.transform(user_data)
     prediction = telecom_model.predict(user_data_scaled)
@@ -128,4 +128,4 @@ def home():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=False)
