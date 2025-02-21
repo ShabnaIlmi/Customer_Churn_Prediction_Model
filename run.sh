@@ -1,10 +1,7 @@
 #!/bin/bash
 
-# Set the Flask app environment variable
-export FLASK_APP=app.py
+# Install any missing dependencies (optional)
+pip install -r requirements.txt
 
-# Set the Flask environment to development (for local testing)
-export FLASK_ENV=development
-
-# Run the Flask app on the default port 5000
-flask run
+# Run the Flask app using Gunicorn in production mode
+gunicorn -b 0.0.0.0:5000 app:app
