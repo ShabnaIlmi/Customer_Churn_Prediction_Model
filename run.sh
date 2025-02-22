@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Install any missing dependencies (optional)
+# Install dependencies (not needed in Heroku since it installs requirements.txt automatically)
 pip install -r requirements.txt
 
-# Run the Flask app using Gunicorn in production mode
+# Start Gunicorn server
 gunicorn -b 0.0.0.0:5000 app:app
