@@ -10,8 +10,8 @@ COPY . /app
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose port 5000
+# Expose the port (Heroku dynamically assigns it)
 EXPOSE 5000
 
 # Command to start the application
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:${PORT:-5000}", "app:app"]

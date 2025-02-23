@@ -1,6 +1,7 @@
 import warnings
 import numpy as np
 import pickle
+import os
 from flask import Flask, request, jsonify, render_template
 
 # Suppress Specific Sklearn Warnings
@@ -29,7 +30,6 @@ except Exception as e:
 # Function to Parse Bank Customer Form Data
 def parse_banking_form(form_data):
     try:
-        # Extract numerical and categorical data
         tenure = int(form_data['tenure'])
         monthly_charges = float(form_data['monthly_charges'])
         total_charges = float(form_data['total_charges'])
@@ -52,7 +52,6 @@ def parse_banking_form(form_data):
         internet_service = form_data['internet_service']
         payment_method = form_data['payment_method']
 
-        # Encode Categorical Variables
         contract_encoded = [1 if contract == "Month-to-month" else 0,
                             1 if contract == "One year" else 0,
                             1 if contract == "Two year" else 0]
@@ -84,7 +83,6 @@ def parse_banking_form(form_data):
 # Function to Parse Telecom Customer Form Data
 def parse_telecom_form(form_data):
     try:
-        # Extract numerical and categorical data
         credit_score = int(form_data['credit_score'])
         age = int(form_data['age'])
         tenure = int(form_data['tenure'])
@@ -154,5 +152,7 @@ def predict_telecom():
 def home():
     return render_template('index.html')
 
+# Fix Heroku Deployment Port Issue
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    port = int(os.environ.get("PORT", 5000))  # Bind to dynamic port
+    app.run(host='0.0.0.0', port=port, debug=False)
