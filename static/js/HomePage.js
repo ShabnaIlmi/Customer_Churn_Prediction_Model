@@ -78,11 +78,21 @@ document.addEventListener("DOMContentLoaded", function () {
     async function validateForm1(event) {
         event.preventDefault();
 
-        const formData = new FormData(document.getElementById("form1"));
+        const form = document.getElementById("form1");
+        const formData = new FormData(form);
+        const formObject = {};
+
+        // Convert FormData to an object
+        formData.forEach((value, key) => {
+            formObject[key] = value;
+        });
 
         const response = await fetch('/api/bank-churn-prediction', {
             method: 'POST',
-            body: formData
+            headers: {
+                'Content-Type': 'application/json' // Tell the server the body is JSON
+            },
+            body: JSON.stringify(formObject) // Send the form data as a JSON object
         });
 
         if (response.ok) {
@@ -98,11 +108,21 @@ document.addEventListener("DOMContentLoaded", function () {
     async function validateForm2(event) {
         event.preventDefault();
 
-        const formData = new FormData(document.getElementById("form2"));
+        const form = document.getElementById("form2");
+        const formData = new FormData(form);
+        const formObject = {};
+
+        // Convert FormData to an object
+        formData.forEach((value, key) => {
+            formObject[key] = value;
+        });
 
         const response = await fetch('/api/telecom-churn-prediction', {
             method: 'POST',
-            body: formData
+            headers: {
+                'Content-Type': 'application/json' // Tell the server the body is JSON
+            },
+            body: JSON.stringify(formObject) // Send the form data as a JSON object
         });
 
         if (response.ok) {
