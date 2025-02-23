@@ -1,18 +1,59 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // Function to display validation messages
+    // Original display message function
     function showValidationMessage(inputElement, message, isError = true) {
-        // Remove any existing validation message
         const existingMessage = inputElement.parentElement.querySelector('.validation-message');
         if (existingMessage) {
             existingMessage.remove();
         }
 
-        // Create and insert new validation message
         const messageDiv = document.createElement('div');
         messageDiv.className = `validation-message ${isError ? 'text-red-500' : 'text-green-500'} text-sm mt-1`;
         messageDiv.textContent = message;
         inputElement.parentElement.appendChild(messageDiv);
     }
+
+    // Form field definitions for validation
+    const BANK_FORM_FIELDS = {
+        tenure: { type: 'number', required: true, min: 0 },
+        monthly_charges: { type: 'number', required: true, min: 0 },
+        total_charges: { type: 'number', required: true, min: 0 },
+        paperless_billing: { type: 'boolean', required: true },
+        senior_citizen: { type: 'boolean', required: true },
+        streaming_tv: { type: 'boolean', required: true },
+        streaming_movies: { type: 'boolean', required: true },
+        multiple_lines: { type: 'boolean', required: true },
+        phone_service: { type: 'boolean', required: true },
+        device_protection: { type: 'boolean', required: true },
+        online_backup: { type: 'boolean', required: true },
+        partner: { type: 'boolean', required: true },
+        dependents: { type: 'boolean', required: true },
+        tech_support: { type: 'boolean', required: true },
+        online_security: { type: 'boolean', required: true },
+        gender: { type: 'select', required: true, options: ['Male', 'Female'] },
+        contract: { type: 'select', required: true, options: ['Month-to-month', 'One year', 'Two year'] },
+        internet_service: { type: 'select', required: true, options: ['Fiber optic', 'DSL', 'No'] },
+        payment_method: { 
+            type: 'select', 
+            required: true, 
+            options: ['Electronic check', 'Mailed check', 'Bank transfer (automatic)', 'Credit card (automatic)'] 
+        }
+    };
+
+    const TELECOM_FORM_FIELDS = {
+        credit_score: { type: 'number', required: true, min: 300, max: 850 },
+        age: { type: 'number', required: true, min: 18, max: 120 },
+        tenure: { type: 'number', required: true, min: 0 },
+        balance: { type: 'number', required: true, min: 0 },
+        num_of_products: { type: 'number', required: true, min: 1 },
+        has_cr_card: { type: 'boolean', required: true },
+        is_active_member: { type: 'boolean', required: true },
+        estimated_salary: { type: 'number', required: true, min: 0 },
+        satisfaction_score: { type: 'number', required: true, min: 1, max: 5 },
+        point_earned: { type: 'number', required: true, min: 0 },
+        geography: { type: 'select', required: true, options: ['France', 'Germany', 'Spain'] },
+        gender: { type: 'select', required: true, options: ['Male', 'Female'] },
+        card_type: { type: 'select', required: true, options: ['DIAMOND', 'GOLD', 'SILVER', 'PLATINUM'] }
+    };
 
     // Function to validate a single field
     function validateField(input) {
@@ -21,6 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const required = input.hasAttribute('required');
         const min = input.getAttribute('min');
         const max = input.getAttribute('max');
+        const pattern = input.getAttribute('pattern');
 
         if (required && !value) {
             showValidationMessage(input, 'This field is required');
@@ -29,6 +71,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (type === 'number' && value) {
             const numValue = Number(value);
+            if (isNaN(numValue)) {
+                showValidationMessage(input, 'Please enter a valid number');
+                return false;
+            }
             if (min && numValue < Number(min)) {
                 showValidationMessage(input, `Value must be at least ${min}`);
                 return false;
@@ -39,7 +85,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
 
-        // Clear validation message if validation passes
         showValidationMessage(input, 'Valid', false);
         return true;
     }
@@ -54,7 +99,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         let isValid = true;
         const inputs = form.querySelectorAll('input, select');
-        
         inputs.forEach(input => {
             if (!validateField(input)) {
                 isValid = false;
@@ -64,46 +108,128 @@ document.addEventListener("DOMContentLoaded", function () {
         return isValid;
     }
 
-    // Enhanced form submission function with validation
-    async function validateAndSubmitForm(formId, endpoint) {
-        console.log(`Validating form ${formId}`);
-        
-        // Validate form before submission
-        if (!validateForm(formId)) {
-            console.log('Form validation failed');
-            return;
+    // The changeValue function for radio buttons and dropdowns
+    window.changeValue = function(inputId, value) {
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.value = value;
+            validateField(input);
         }
+    };
 
+    // Transform and validate form data before submission
+    function prepareFormData(formId) {
         const form = document.getElementById(formId);
         const formData = new FormData(form);
         const formObject = {};
+        const fields = formId === 'form1' ? BANK_FORM_FIELDS : TELECOM_FORM_FIELDS;
         
-        formData.forEach((value, key) => {
-            formObject[key] = value;
-        });
+        for (const [key, value] of formData.entries()) {
+            const fieldDef = fields[key];
+            if (!fieldDef) {
+                console.warn(`Unknown field: ${key}`);
+                continue;
+            }
 
+            if (fieldDef.required && !value) {
+                throw new Error(`${key} is required`);
+            }
+
+            switch (fieldDef.type) {
+                case 'number':
+                    const num = Number(value);
+                    if (isNaN(num)) {
+                        throw new Error(`${key} must be a number`);
+                    }
+                    if (fieldDef.min !== undefined && num < fieldDef.min) {
+                        throw new Error(`${key} must be at least ${fieldDef.min}`);
+                    }
+                    if (fieldDef.max !== undefined && num > fieldDef.max) {
+                        throw new Error(`${key} must be no more than ${fieldDef.max}`);
+                    }
+                    formObject[key] = num;
+                    break;
+
+                case 'boolean':
+                    formObject[key] = value === 'true' || value === '1' ? 1 : 0;
+                    break;
+
+                case 'select':
+                    if (!fieldDef.options.includes(value)) {
+                        throw new Error(`Invalid option for ${key}: ${value}`);
+                    }
+                    formObject[key] = value;
+                    break;
+
+                default:
+                    formObject[key] = value;
+            }
+        }
+
+        return formObject;
+    }
+
+    // Enhanced form submission function
+    async function validateAndSubmitForm(formId, endpoint) {
         try {
+            console.log(`Validating form ${formId}`);
+            
+            if (!validateForm(formId)) {
+                console.log('Form validation failed');
+                return;
+            }
+
+            const formData = prepareFormData(formId);
+            
             const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                 },
-                body: JSON.stringify(formObject)
+                body: JSON.stringify(formData)
             });
 
-            if (response.ok) {
-                const result = await response.json();
-                alert("Prediction result: " + result.prediction);
-            } else {
-                alert(`Error: ${response.statusText}. Unable to submit form. Please try again.`);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `Server error: ${response.status}`);
             }
+
+            const result = await response.json();
+            
+            // Show result in a more user-friendly way
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'mt-4 p-4 rounded-lg ' + 
+                (result.prediction === 'Churned' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700');
+            resultDiv.textContent = `Prediction: ${result.prediction}`;
+            
+            const form = document.getElementById(formId);
+            const existingResult = form.querySelector('.prediction-result');
+            if (existingResult) {
+                existingResult.remove();
+            }
+            resultDiv.className += ' prediction-result';
+            form.appendChild(resultDiv);
+
         } catch (error) {
-            console.error("Error with request:", error);
-            alert("Error: Unable to submit form. Please check your network connection or try again later.");
+            alert(error.message);
+            console.error('Submission error:', error);
         }
     }
 
-    // Add real-time validation on input
+    // Function to show/hide forms
+    function showForm(formId) {
+        const forms = document.querySelectorAll('#form1, #form2');
+        forms.forEach(form => form.style.display = 'none');
+
+        const selectedForm = document.getElementById(formId);
+        if (selectedForm) {
+            selectedForm.style.display = 'block';
+            selectedForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+    // Initialize form event listeners
     const forms = document.querySelectorAll('#form1, #form2');
     forms.forEach(form => {
         const inputs = form.querySelectorAll('input, select');
@@ -114,83 +240,41 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // Form submission handlers
-    const form1 = document.getElementById("form1");
-    const form2 = document.getElementById("form2");
+    ['form1', 'form2'].forEach(formId => {
+        const form = document.getElementById(formId);
+        const submitBtn = document.getElementById(`submitBtn${formId.slice(-1)}`);
+        const endpoint = formId === 'form1' ? '/api/bank-churn-prediction' : '/api/telecom-churn-prediction';
 
-    if (form1) {
-        form1.addEventListener("submit", (event) => {
-            event.preventDefault();
-            validateAndSubmitForm("form1", '/api/bank-churn-prediction');
-        });
-    }
-
-    if (form2) {
-        form2.addEventListener("submit", (event) => {
-            event.preventDefault();
-            validateAndSubmitForm("form2", '/api/telecom-churn-prediction');
-        });
-    }
-
-    // Submit button handlers
-    const submitBtn1 = document.getElementById("submitBtn1");
-    const submitBtn2 = document.getElementById("submitBtn2");
-
-    if (submitBtn1) {
-        submitBtn1.addEventListener("click", (event) => {
-            event.preventDefault();
-            validateAndSubmitForm("form1", '/api/bank-churn-prediction');
-        });
-    }
-
-    if (submitBtn2) {
-        submitBtn2.addEventListener("click", (event) => {
-            event.preventDefault();
-            validateAndSubmitForm("form2", '/api/telecom-churn-prediction');
-        });
-    }
-
-    // Rest of your existing code for showing forms and handling other interactions
-    function showForm(formId) {
-        const form1 = document.getElementById("form1");
-        const form2 = document.getElementById("form2");
-
-        form1.style.display = "none";
-        form2.style.display = "none";
-
-        if (formId === "form1") {
-            form1.style.display = "block";
-            form1.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        } else if (formId === "form2") {
-            form2.style.display = "block";
-            form2.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (form) {
+            form.addEventListener("submit", (event) => {
+                event.preventDefault();
+                validateAndSubmitForm(formId, endpoint);
+            });
         }
-    }
 
-    // Initialize other button listeners
-    const bankChurnBtn = document.getElementById("bankChurnBtn");
-    const telecomChurnBtn = document.getElementById("telecomChurnBtn");
-    const bankChurnLink = document.getElementById("bankChurnLink");
-    const telecomChurnLink = document.getElementById("telecomChurnLink");
+        if (submitBtn) {
+            submitBtn.addEventListener("click", (event) => {
+                event.preventDefault();
+                validateAndSubmitForm(formId, endpoint);
+            });
+        }
+    });
 
-    if (bankChurnBtn) {
-        bankChurnBtn.addEventListener("click", () => showForm("form1"));
-    }
+    // Initialize navigation button listeners
+    ['bank', 'telecom'].forEach(type => {
+        const btn = document.getElementById(`${type}ChurnBtn`);
+        const link = document.getElementById(`${type}ChurnLink`);
+        const formId = type === 'bank' ? 'form1' : 'form2';
 
-    if (telecomChurnBtn) {
-        telecomChurnBtn.addEventListener("click", () => showForm("form2"));
-    }
+        if (btn) {
+            btn.addEventListener("click", () => showForm(formId));
+        }
 
-    if (bankChurnLink) {
-        bankChurnLink.addEventListener("click", (event) => {
-            event.preventDefault();
-            showForm("form1");
-        });
-    }
-
-    if (telecomChurnLink) {
-        telecomChurnLink.addEventListener("click", (event) => {
-            event.preventDefault();
-            showForm("form2");
-        });
-    }
+        if (link) {
+            link.addEventListener("click", (event) => {
+                event.preventDefault();
+                showForm(formId);
+            });
+        }
+    });
 });
