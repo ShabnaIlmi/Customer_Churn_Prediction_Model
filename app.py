@@ -120,7 +120,7 @@ def parse_telecom_form(form_data):
         raise ValueError(f"Error processing form data: {e}")
 
 # Predict Bank Churn
-@app.route('/api/bank-churn-prediction', methods=['GET'])
+@app.route('/api/bank-churn-prediction', methods=['POST'])
 def predict_banking():
     try:
         form_data = request.get_json()  # Parse incoming JSON request
@@ -134,7 +134,7 @@ def predict_banking():
         return jsonify({'error': 'An error occurred during prediction.'}), 500
 
 # Predict Telecom Churn
-@app.route('/api/telecom-churn-prediction', methods=['GET'])
+@app.route('/api/telecom-churn-prediction', methods=['POST'])
 def predict_telecom():
     try:
         form_data = request.get_json()  # Parse incoming JSON request
