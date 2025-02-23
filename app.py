@@ -150,7 +150,10 @@ def predict_telecom():
 # About Me Page
 @app.route('/aboutme')
 def aboutme():
-    return render_template('AboutMe.html')
+    try:
+        return render_template('AboutMe.html')
+    except Exception as e:
+        return f"Error: {str(e)}"
 
 # Home Page (Optional)
 @app.route('/')
