@@ -87,20 +87,25 @@ document.addEventListener("DOMContentLoaded", function () {
             formObject[key] = value;
         });
 
-        const response = await fetch('/api/bank-churn-prediction', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json' // Tell the server the body is JSON
-            },
-            body: JSON.stringify(formObject) // Send the form data as a JSON object
-        });
+        try {
+            const response = await fetch('/api/bank-churn-prediction', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json' // Tell the server the body is JSON
+                },
+                body: JSON.stringify(formObject) // Send the form data as a JSON object
+            });
 
-        if (response.ok) {
-            const result = await response.json();
-            alert("Prediction result: " + result.prediction);
-            // You can also handle success response, like redirecting or displaying additional info
-        } else {
-            alert("Error: Unable to submit form. Please try again.");
+            if (response.ok) {
+                const result = await response.json();
+                alert("Prediction result: " + result.prediction);
+                // You can also handle success response, like redirecting or displaying additional info
+            } else {
+                alert(`Error: ${response.statusText}. Unable to submit form. Please try again.`);
+            }
+        } catch (error) {
+            console.error("Error with request:", error);
+            alert("Error: Unable to submit form. Please check your network connection or try again later.");
         }
     }
 
@@ -117,19 +122,24 @@ document.addEventListener("DOMContentLoaded", function () {
             formObject[key] = value;
         });
 
-        const response = await fetch('/api/telecom-churn-prediction', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json' // Tell the server the body is JSON
-            },
-            body: JSON.stringify(formObject) // Send the form data as a JSON object
-        });
+        try {
+            const response = await fetch('/api/telecom-churn-prediction', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json' // Tell the server the body is JSON
+                },
+                body: JSON.stringify(formObject) // Send the form data as a JSON object
+            });
 
-        if (response.ok) {
-            const result = await response.json();
-            alert("Prediction result: " + result.prediction);
-        } else {
-            alert("Error: Unable to submit form. Please try again.");
+            if (response.ok) {
+                const result = await response.json();
+                alert("Prediction result: " + result.prediction);
+            } else {
+                alert(`Error: ${response.statusText}. Unable to submit form. Please try again.`);
+            }
+        } catch (error) {
+            console.error("Error with request:", error);
+            alert("Error: Unable to submit form. Please check your network connection or try again later.");
         }
     }
 
