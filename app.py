@@ -147,13 +147,14 @@ def predict_telecom():
     except Exception as e:
         return jsonify({'error': 'An error occurred during prediction.'}), 500
 
-# About Me Page
 @app.route('/aboutme')
+@app.route('/AboutMe.html')
 def aboutme():
     try:
         return render_template('AboutMe.html')
     except Exception as e:
-        return f"Error: {str(e)}"
+        app.logger.error(f"Error loading AboutMe page: {str(e)}")
+        return f"Error loading AboutMe page: {str(e)}", 500
 
 # Home Page (Optional)
 @app.route('/')
