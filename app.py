@@ -146,7 +146,14 @@ def predict_telecom():
         return jsonify({'error': str(e)}), 400
     except Exception as e:
         return jsonify({'error': 'An error occurred during prediction.'}), 500
+    
+# Simple navigation routes - both return to index
+@app.route('/bank-prediction')
+@app.route('/telecom-prediction')
+def return_to_index():
+    return redirect('/')    
 
+# About Me Page
 @app.route('/aboutme')
 @app.route('/AboutMe.html')
 def aboutme():
@@ -156,8 +163,9 @@ def aboutme():
         app.logger.error(f"Error loading AboutMe page: {str(e)}")
         return f"Error loading AboutMe page: {str(e)}", 500
 
-# Home Page (Optional)
+# Home Page 
 @app.route('/')
+@app.route('/index.html')
 def home():
     return render_template('index.html')
 
